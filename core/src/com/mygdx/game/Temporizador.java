@@ -27,6 +27,14 @@ public class Temporizador {
         return false;
     }
 
+    public boolean aparece() {
+        if (activo && framesJuego == alarma) {
+            alarma ++;
+            return true;
+        }
+        return false;
+    }
+
     public void activar() {
         activo = true;
         alarma = framesJuego + frecuencia;

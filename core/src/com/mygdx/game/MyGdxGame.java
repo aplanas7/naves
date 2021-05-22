@@ -10,16 +10,19 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 public class MyGdxGame extends ApplicationAdapter {
     SpriteBatch batch;
     BitmapFont font;
     Fondo fondo;
     Jugador jugador;
+    BoostVelocidad boostVelocidad;
+    BoostDobleDisparo boostDobleDisparo;
     List<EnemigoBase> enemigos;
     List<Disparo> disparosAEliminar;
     List<EnemigoBase> enemigosAEliminar;
-    Temporizador nuevoEnemigo, nuevoEnemigo2, nuevoEnemigo3;
+    Temporizador nuevoEnemigo, nuevoEnemigo2, nuevoEnemigo3, nuevoBoostV, nuevoBoostD;
     ScoreBoard scoreboard;
     boolean gameover;
 
@@ -39,14 +42,18 @@ public class MyGdxGame extends ApplicationAdapter {
         fondo = new Fondo();
         jugador = new Jugador();
         enemigos = new ArrayList<>();
+        boostVelocidad = new BoostVelocidad();
+        boostDobleDisparo = new BoostDobleDisparo();
+        disparosAEliminar = new ArrayList<>();
+        enemigosAEliminar = new ArrayList<>();
+        gameover = false;
+        scoreboard = new ScoreBoard();
+        // Temporizadores
         nuevoEnemigo = new Temporizador(120);
         nuevoEnemigo2 = new Temporizador(300);
         nuevoEnemigo3 = new Temporizador(360);
-        disparosAEliminar = new ArrayList<>();
-        enemigosAEliminar = new ArrayList<>();
-        scoreboard = new ScoreBoard();
-
-        gameover = false;
+        nuevoBoostV = new Temporizador(Utils.random.nextInt(900));
+        nuevoBoostD = new Temporizador(Utils.random.nextInt(1200));
     }
 
     void enemigoAnalizar() {
@@ -89,6 +96,18 @@ public class MyGdxGame extends ApplicationAdapter {
         if (nuevoEnemigo3.suena()) enemigos.add(new Enemigo3());
 
         if(!gameover) jugador.update();
+        if(nuevoBoostV.aparece()) boostVelocidad.update();
+        if(nuevoBoostD.aparece()) boostDobleDisparo.update();
+
+        if (!gameover && !jugador.muerto && Utils.solapan(boostVelocidad.x, boostVelocidad.y, boostVelocidad.w, boostVelocidad.h, jugador.x, jugador.y, jugador.w, jugador.h)) {
+            jugador.v = 10;
+            boostVelocidad.pillao = true;
+        }
+
+        if (!gameover && !jugador.muerto && Utils.solapan(boostDobleDisparo.x, boostDobleDisparo.y, boostDobleDisparo.w, boostDobleDisparo.h, jugador.x, jugador.y, jugador.w, jugador.h)) {
+            jugador.dobleDisparo = true;
+            boostDobleDisparo.pillao = true;
+        }
 
         for (EnemigoBase enemigo : enemigos) enemigo.update();              // enemigos.forEach(Enemigo::update);
 
@@ -123,6 +142,8 @@ public class MyGdxGame extends ApplicationAdapter {
         batch.begin();
         fondo.render(batch);
         jugador.render(batch);
+        if (!boostVelocidad.pillao) boostVelocidad.render(batch);
+        if (!boostDobleDisparo.pillao) boostDobleDisparo.render(batch);
 
         for (EnemigoBase enemigo : enemigos) enemigo.render(batch);  // enemigos.forEach(e -> e.render(batch));
         font.draw(batch, "Vidas: " + jugador.vidas, 520, 460);

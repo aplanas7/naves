@@ -27,8 +27,10 @@ public class Jugador {
     List<Disparo> disparos = new ArrayList<>();
     int vidas = 3;
     int puntos = 0;
+    int cadencia = 20;
+    boolean dobleDisparo = false;
     boolean muerto = false;
-    Temporizador temporizadorFireRate = new Temporizador(20);
+    Temporizador temporizadorFireRate = new Temporizador(cadencia);
     Temporizador temporizadorRespawn = new Temporizador(120, false);
 
     Jugador() {
@@ -47,8 +49,12 @@ public class Jugador {
         if (Gdx.input.isKeyPressed(Input.Keys.W)) y += v;
         if (Gdx.input.isKeyPressed(Input.Keys.S)) y -= v;
 
-        if (Gdx.input.isKeyPressed(Input.Keys.SPACE) && temporizadorFireRate.suena() && !muerto) {
-            disparos.add(new Disparo(x + w / 2, y + h));
+        if (!dobleDisparo && Gdx.input.isKeyPressed(Input.Keys.SPACE) && temporizadorFireRate.suena() && !muerto) {
+            disparos.add(new Disparo(x + w, y + h / 2));
+        }
+        if (dobleDisparo && Gdx.input.isKeyPressed(Input.Keys.SPACE) && temporizadorFireRate.suena() && !muerto) {
+            disparos.add(new Disparo(x + w, y + h - 15));
+            disparos.add(new Disparo(x + w, y + 15));
         }
 
         if (x < 0) x = 0;
