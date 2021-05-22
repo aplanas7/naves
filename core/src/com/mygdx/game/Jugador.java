@@ -2,6 +2,7 @@ package com.mygdx.game;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 
@@ -30,6 +31,7 @@ public class Jugador {
     int cadencia = 20;
     boolean dobleDisparo = false;
     boolean muerto = false;
+    private Sound disparo;
     Temporizador temporizadorFireRate = new Temporizador(cadencia);
     Temporizador temporizadorRespawn = new Temporizador(120, false);
 
@@ -39,6 +41,7 @@ public class Jugador {
         w = 40 * 2;
         h = 40 * 2;
         v = 5;
+        disparo = Gdx.audio.newSound(Gdx.files.internal("sounds/shoot.mp3"));
     }
 
     void update() {
@@ -49,12 +52,14 @@ public class Jugador {
         if (Gdx.input.isKeyPressed(Input.Keys.W)) y += v;
         if (Gdx.input.isKeyPressed(Input.Keys.S)) y -= v;
 
-        if (!dobleDisparo && Gdx.input.isKeyPressed(Input.Keys.SPACE) && temporizadorFireRate.suena() && !muerto) {
+        if (!dobleDisparo && Gdx.input.isKeyJustPressed(Input.Keys.SPACE) && temporizadorFireRate.suena() && !muerto) {
             disparos.add(new Disparo(x + w, y + h / 2));
+            disparo.play();
         }
-        if (dobleDisparo && Gdx.input.isKeyPressed(Input.Keys.SPACE) && temporizadorFireRate.suena() && !muerto) {
+        if (dobleDisparo && Gdx.input.isKeyJustPressed(Input.Keys.SPACE) && temporizadorFireRate.suena() && !muerto) {
             disparos.add(new Disparo(x + w, y + h - 15));
             disparos.add(new Disparo(x + w, y + 15));
+            disparo.play();
         }
 
         if (x < 0) x = 0;

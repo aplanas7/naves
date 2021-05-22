@@ -1,5 +1,6 @@
 package com.mygdx.game;
 
+import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 
@@ -35,8 +36,6 @@ public class Fondo {
             new Texture("background/frame_27_delay-0.03s.gif"),
             new Texture("background/frame_28_delay-0.03s.gif"),
             new Texture("background/frame_29_delay-0.03s.gif")
-
-
 
     );
 

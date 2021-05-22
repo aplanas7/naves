@@ -2,6 +2,8 @@ package com.mygdx.game;
 
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.audio.Music;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
@@ -25,10 +27,14 @@ public class MyGdxGame extends ApplicationAdapter {
     Temporizador nuevoEnemigo, nuevoEnemigo2, nuevoEnemigo3, nuevoBoostV, nuevoBoostD;
     ScoreBoard scoreboard;
     boolean gameover;
+    private Music music;
+    Sound explosion;
 
 
     @Override
     public void create() {
+        music = Gdx.audio.newMusic(Gdx.files.internal("sounds/music.ogg"));
+        explosion = Gdx.audio.newSound(Gdx.files.internal("sounds/explosion.wav"));
         batch = new SpriteBatch();
         font = new BitmapFont();
         font.setColor(Color.WHITE);
@@ -39,6 +45,9 @@ public class MyGdxGame extends ApplicationAdapter {
     }
 
     void inicializarJuego(){
+        music.setVolume((float) 0.8);
+        music.setLooping(true);
+        music.play();
         fondo = new Fondo();
         jugador = new Jugador();
         enemigos = new ArrayList<>();
@@ -74,6 +83,7 @@ public class MyGdxGame extends ApplicationAdapter {
                 jugador.morir();
                 if (jugador.vidas == 0){
                     gameover = true;
+                    explosion.play();
                 }
             }
 
