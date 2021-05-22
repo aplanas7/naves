@@ -17,10 +17,9 @@ public class MyGdxGame extends ApplicationAdapter {
     Fondo fondo;
     Jugador jugador;
     List<EnemigoBase> enemigos;
-    List<EnemigoBase> enemigos2;
     List<Disparo> disparosAEliminar;
     List<EnemigoBase> enemigosAEliminar;
-    Temporizador nuevoEnemigo, nuevoEnemigo2;
+    Temporizador nuevoEnemigo, nuevoEnemigo2, nuevoEnemigo3;
     ScoreBoard scoreboard;
     boolean gameover;
 
@@ -40,9 +39,9 @@ public class MyGdxGame extends ApplicationAdapter {
         fondo = new Fondo();
         jugador = new Jugador();
         enemigos = new ArrayList<>();
-        enemigos2 = new ArrayList<>();
         nuevoEnemigo = new Temporizador(120);
         nuevoEnemigo2 = new Temporizador(300);
+        nuevoEnemigo3 = new Temporizador(360);
         disparosAEliminar = new ArrayList<>();
         enemigosAEliminar = new ArrayList<>();
         scoreboard = new ScoreBoard();
@@ -51,35 +50,31 @@ public class MyGdxGame extends ApplicationAdapter {
     }
 
     void enemigoAnalizar() {
-        List<List<EnemigoBase>> listasEnemigos = new ArrayList();
-        listasEnemigos.add(enemigos);
-        listasEnemigos.add(enemigos2);
 
-        for(List<EnemigoBase> list:listasEnemigos) {
+        // en la lista enemigos se ponen objetos tanto de Enemigo como de Enemigo2
+        for (EnemigoBase enemigo : enemigos) {
+            for (Disparo disparo : jugador.disparos) {
+                if (Utils.solapan(disparo.x, disparo.y, disparo.w, disparo.h, enemigo.x, enemigo.y, enemigo.w, enemigo.h)) {
+                    disparosAEliminar.add(disparo);
+                    if (enemigo.vidas == 1) {enemigosAEliminar.add(enemigo);} else {enemigo.vidas -= 1;}
 
-            for (EnemigoBase enemigo : list) {
-                for (Disparo disparo : jugador.disparos) {
-                    if (Utils.solapan(disparo.x, disparo.y, disparo.w, disparo.h, enemigo.x, enemigo.y, enemigo.w, enemigo.h)) {
-                        disparosAEliminar.add(disparo);
-                        enemigosAEliminar.add(enemigo);
-                        jugador.puntos++;
-                        break;
-                    }
+                    jugador.puntos++;
+                    break;
                 }
+            }
 
-                if (!gameover && !jugador.muerto && Utils.solapan(enemigo.x, enemigo.y, enemigo.w, enemigo.h, jugador.x, jugador.y, jugador.w, jugador.h)) {
-                    jugador.morir();
-                    if (jugador.vidas == 0){
-                        gameover = true;
-                    }
+            if (!gameover && !jugador.muerto && Utils.solapan(enemigo.x, enemigo.y, enemigo.w, enemigo.h, jugador.x, jugador.y, jugador.w, jugador.h)) {
+                jugador.morir();
+                if (jugador.vidas == 0){
+                    gameover = true;
                 }
+            }
 
-                if (enemigo.x < -enemigo.w) {
-                    enemigosAEliminar.add(enemigo);
-                    if (jugador.puntos != 0){
-                        if (gameover==false) {
-                            jugador.puntos--;
-                        }
+            if (enemigo.x < -enemigo.w) {
+                enemigosAEliminar.add(enemigo);
+                if (jugador.puntos != 0){
+                    if (gameover==false) {
+                        jugador.puntos--;
                     }
                 }
             }
@@ -90,15 +85,13 @@ public class MyGdxGame extends ApplicationAdapter {
         Temporizador.framesJuego += 1;
 
         if (nuevoEnemigo.suena()) enemigos.add(new Enemigo());
-        if (nuevoEnemigo2.suena()) enemigos2.add(new Enemigo2());
+        if (nuevoEnemigo2.suena()) enemigos.add(new Enemigo2());
+        if (nuevoEnemigo3.suena()) enemigos.add(new Enemigo3());
 
         if(!gameover) jugador.update();
 
         for (EnemigoBase enemigo : enemigos) enemigo.update();              // enemigos.forEach(Enemigo::update);
-        for (EnemigoBase enemigo2 : enemigos2) enemigo2.update();
 
-        enemigoAnalizar();
-        enemigoAnalizar();
         enemigoAnalizar();
 
         for (Disparo disparo : jugador.disparos)
@@ -132,7 +125,6 @@ public class MyGdxGame extends ApplicationAdapter {
         jugador.render(batch);
 
         for (EnemigoBase enemigo : enemigos) enemigo.render(batch);  // enemigos.forEach(e -> e.render(batch));
-        for (EnemigoBase enemigo2 : enemigos2) enemigo2.render(batch);
         font.draw(batch, "Vidas: " + jugador.vidas, 520, 460);
         font.draw(batch, "Puntos: " + jugador.puntos, 15, 460);
 
@@ -151,11 +143,7 @@ public class MyGdxGame extends ApplicationAdapter {
 
 
 /*
-
 init();
-
 create();
-
 while(true) render();
-
  */
